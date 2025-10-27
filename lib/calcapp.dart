@@ -8,6 +8,51 @@ class Calcapp extends StatefulWidget {
 }
 
 class _CalcappState extends State<Calcapp> {
+  String output = "0";
+  String _output = "0";
+  double num1 = 0;
+  double num2 = 0;
+  String operand = "";
+  buttonpresses(String buttontext) {
+    if (buttontext == "C") {
+      _output = "0";
+      num1 = 0;
+      num2 = 0;
+      operand = "";
+    } else if (buttontext == "+" ||
+        buttontext == "-" ||
+        buttontext == "/" ||
+        buttontext == "*") {
+      num1 = double.parse(output);
+      operand = buttontext;
+      _output = "0 ";
+    } else if (buttontext == "=") {
+      num2 = double.parse(output);
+      switch (operand) {
+        case "+":
+          _output = (num1 + num2).toString();
+          break;
+        case "-":
+          _output = (num1 - num2).toString();
+          break;
+        case "*":
+          _output = (num1 * num2).toString();
+          break;
+        case "/":
+          _output = (num1 / num2).toString();
+          break;
+      }
+      num1 = 0;
+      num2 = 0;
+      operand = "";
+    } else {
+      _output = _output + buttontext;
+    }
+    setState(() {
+      output = double.parse(_output).toStringAsFixed(2);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,7 +64,7 @@ class _CalcappState extends State<Calcapp> {
             Container(
               alignment: Alignment.centerRight,
               padding: EdgeInsets.all(20),
-              child: Text("0", style: TextStyle(fontSize: 50)),
+              child: Text(output, style: TextStyle(fontSize: 50)),
             ),
             Expanded(child: Divider(color: Colors.black)),
 
@@ -27,6 +72,7 @@ class _CalcappState extends State<Calcapp> {
               children: [
                 Row(
                   children: [
+                    //applying the button widget that has been created below
                     buildbutton('7', Colors.black),
                     buildbutton('8', Colors.black),
                     buildbutton('9', Colors.black),
@@ -66,6 +112,7 @@ class _CalcappState extends State<Calcapp> {
     );
   }
 
+  //creating a button widget
   Widget buildbutton(String buttonText, Color colorbutton) {
     return Expanded(
       child: Container(
@@ -79,7 +126,9 @@ class _CalcappState extends State<Calcapp> {
             ),
             backgroundColor: colorbutton,
           ),
-          onPressed: () {},
+          onPressed: () {
+            buttonpresses(buttonText);
+          },
           child: Text(
             buttonText,
             style: TextStyle(fontSize: 24, color: Colors.white),
