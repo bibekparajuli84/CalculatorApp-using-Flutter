@@ -13,19 +13,23 @@ class _CalcappState extends State<Calcapp> {
   double num1 = 0;
   double num2 = 0;
   String operand = "";
+  String expression = "";
+
   buttonpresses(String buttontext) {
     if (buttontext == "C") {
       _output = "0";
       num1 = 0;
       num2 = 0;
       operand = "";
+      expression = "";
     } else if (buttontext == "+" ||
         buttontext == "-" ||
         buttontext == "/" ||
         buttontext == "*") {
       num1 = double.parse(output);
       operand = buttontext;
-      _output = "0 ";
+      _output = "0";
+      expression = "$num1 $operand";
     } else if (buttontext == "=") {
       num2 = double.parse(output);
       switch (operand) {
@@ -42,14 +46,23 @@ class _CalcappState extends State<Calcapp> {
           _output = (num1 / num2).toString();
           break;
       }
+      expression = "$num1 $operand $num2 =";
       num1 = 0;
       num2 = 0;
       operand = "";
     } else {
       _output = _output + buttontext;
+
+      if (operand.isEmpty) {
+        expression = _output; // it show current input
+      } else {
+        expression = "$num1 $operand $_output"; // it show partial expression
+      }
     }
     setState(() {
-      output = double.parse(_output).toStringAsFixed(2);
+      output = double.parse(
+        _output,
+      ).toStringAsFixed(2).replaceAll(RegExp(r'\.00$'), '');
     });
   }
 
@@ -63,16 +76,23 @@ class _CalcappState extends State<Calcapp> {
           children: [
             Container(
               alignment: Alignment.centerRight,
-              padding: EdgeInsets.all(20),
-              child: Text(output, style: TextStyle(fontSize: 50)),
+              padding: const EdgeInsets.only(top: 20, right: 20),
+              child: Text(
+                expression,
+                style: const TextStyle(fontSize: 24, color: Colors.grey),
+              ),
             ),
-            Expanded(child: Divider(color: Colors.black)),
+            Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.all(20),
+              child: Text(output, style: const TextStyle(fontSize: 30)),
+            ),
+            const Expanded(child: Divider(color: Colors.black)),
 
             Column(
               children: [
                 Row(
                   children: [
-                    //applying the button widget that has been created below
                     buildbutton('7', Colors.black),
                     buildbutton('8', Colors.black),
                     buildbutton('9', Colors.black),
@@ -116,11 +136,10 @@ class _CalcappState extends State<Calcapp> {
   Widget buildbutton(String buttonText, Color colorbutton) {
     return Expanded(
       child: Container(
-        margin: EdgeInsets.all(5),
-
+        margin: const EdgeInsets.all(5),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -131,7 +150,7 @@ class _CalcappState extends State<Calcapp> {
           },
           child: Text(
             buttonText,
-            style: TextStyle(fontSize: 24, color: Colors.white),
+            style: const TextStyle(fontSize: 24, color: Colors.white),
           ),
         ),
       ),
