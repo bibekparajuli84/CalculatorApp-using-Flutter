@@ -15,7 +15,14 @@ class _CalcappState extends State<Calcapp> {
   String operand = "";
   String expression = "";
 
-  buttonpresses(String buttontext) {
+  // Formating number, showing int if no decimal, otherwise it shows double
+  String formatNumber(double number) {
+    return number == number.toInt()
+        ? number.toInt().toString()
+        : number.toString();
+  }
+
+  void buttonpresses(String buttontext) {
     if (buttontext == "C") {
       _output = "0";
       num1 = 0;
@@ -29,9 +36,11 @@ class _CalcappState extends State<Calcapp> {
       num1 = double.parse(output);
       operand = buttontext;
       _output = "0";
-      expression = "$num1 $operand";
+
+      expression = "${formatNumber(num1)} $operand";
     } else if (buttontext == "=") {
       num2 = double.parse(output);
+
       switch (operand) {
         case "+":
           _output = (num1 + num2).toString();
@@ -46,19 +55,27 @@ class _CalcappState extends State<Calcapp> {
           _output = (num1 / num2).toString();
           break;
       }
-      expression = "$num1 $operand $num2 =";
+
+      expression =
+          "${formatNumber(num1)} $operand ${formatNumber(num2)} = ${formatNumber(double.parse(_output))}";
+
       num1 = 0;
       num2 = 0;
       operand = "";
     } else {
-      _output = _output + buttontext;
+      if (_output == "0") {
+        _output = buttontext;
+      } else {
+        _output += buttontext;
+      }
 
       if (operand.isEmpty) {
-        expression = _output; // it show current input
+        expression = _output;
       } else {
-        expression = "$num1 $operand $_output"; // it show partial expression
+        expression = "${formatNumber(num1)} $operand $_output";
       }
     }
+
     setState(() {
       output = double.parse(
         _output,
@@ -71,8 +88,14 @@ class _CalcappState extends State<Calcapp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(title: const Text('Calculator App')),
+        appBar: AppBar(
+          title: const Text(
+            'Calculator App',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
               alignment: Alignment.centerRight,
@@ -87,7 +110,8 @@ class _CalcappState extends State<Calcapp> {
               padding: const EdgeInsets.all(20),
               child: Text(output, style: const TextStyle(fontSize: 30)),
             ),
-            const Expanded(child: Divider(color: Colors.black)),
+
+            const Divider(color: Colors.black),
 
             Column(
               children: [
@@ -132,7 +156,6 @@ class _CalcappState extends State<Calcapp> {
     );
   }
 
-  //creating a button widget
   Widget buildbutton(String buttonText, Color colorbutton) {
     return Expanded(
       child: Container(
